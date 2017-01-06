@@ -3,11 +3,217 @@
   <head>
     <meta charset='utf-8'>
     <title>Cards</title>
-    <link rel="stylesheet" type="text/css" href="cards.css">
-    <script src="jquery-3.1.1.slim.min.js"></script>
+    <style type="text/css">
+      * {
+        box-sizing: border-box;
+      }
+
+      .clearfix::after {
+        content: " ";
+        display: table;
+        clear: both;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      body, button, input {
+        font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+        font-size: 18px;
+        line-height: 1.4;
+      }
+
+      h1 {
+        margin-top: 0;
+      }
+
+
+      h2 {
+        margin-top: 0;
+      }
+
+      .btn {
+          display: inline-block;
+          padding: 6px 12px;
+          text-align: center;
+          vertical-align: middle;
+          touch-action: manipulation;
+          cursor: pointer;
+          user-select: none;
+          border: 1px solid transparent;
+          border-radius: 4px;
+          margin: 5px 0;
+          font-size: 20px;
+          text-decoration: none;
+        }
+      }
+
+      .btn:hover {
+
+      }
+
+      .btn-default {
+        color: #000;
+        background-color: #fff;
+        border-color: #ccc;
+      }
+
+      .btn-default:hover {
+        background-color: #e6e6e6;
+        border-color: #adadad;
+      }
+
+      .btn-primary {
+        color: #fff;
+        background-color: #286090;
+        border-color: #204d74;
+      }
+
+      .btn-primary:hover {
+        background-color: #204d74;
+        border-color: #204d74;
+      }
+
+      #page-wrapper {
+        max-width: 600px;
+        margin: 0 auto;
+        padding-top: 45px;
+      }
+
+      #card {
+        border: 1px solid #ddd;
+        box-shadow: 0 1px 1px rgba(0,0,0,.05);
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      #answers {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      #answers li {
+        font-size: 20px;
+        margin-left: 5px;
+        margin-right: 5px;
+      }
+
+      #answers li:first-child {
+        margin-left: 0;
+      }
+
+      #answers li:last-child {
+        margin-right: 0;
+      }
+
+      #answers li.selected {
+        background-color: #d9534f;
+        border-color: #d43f3a;
+      }
+
+      #answers li.selected::after {
+        content: " ✗";
+      }
+
+      #answers li.selected.correct {
+        background-color: #449d44;
+        border-color: #398439;
+      }
+
+      #answers li.selected.correct::after {
+        content: " ✓";
+      }
+    </style>
     <script src="underscore-min.js"></script>
     <script src="questions.js"></script>
-    <script src="cards.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function(event) {
+        cardSet.allAnswers = _.chain(cardSet.cards).map(function(question) {
+          return question.answer;
+        }).uniq().value();
+
+        cardSet.wrongAnswerCount = (cardSet.allAnswers.length > 3 ? 3 : (cardSet.allAnswers.length - 1));
+
+        var state = null;
+
+        function nextQuestion() {
+          var card = state.cards.shift();
+          if(card) showCard(card);
+          else completeRound();
+        }
+
+        function showCard(card) {
+          document.querySelector("#question").innerText = card.text;
+
+          var answers = _.chain(cardSet.allAnswers).without(card.answer).shuffle().first(cardSet.wrongAnswerCount).
+            value();
+          answers.push(card.answer);
+
+          document.querySelector("#answers").innerHTML = "";
+          _.each(_.shuffle(answers), function(answer) {
+            var li = document.createElement("li");
+            li.classList.add("btn");
+            li.classList.add("btn-primary");
+            li.innerText = answer;
+
+            if(answer == card.answer) li.classList.add("correct");
+            document.querySelector("#answers").appendChild(li);
+          });
+        }
+
+        function startRound() {
+          state = {
+            cards: _.shuffle(cardSet.cards),
+            correct: 0,
+            total: 0
+          };
+
+          nextQuestion();
+          document.querySelector("#card").style.display = "block";
+          document.querySelector("#stop").style.display = "inline-block";
+          document.querySelector("#start").style.display = "none";
+        }
+
+        function completeRound() {
+          document.querySelector("#card").style.display = "none";
+          document.querySelector("#stop").style.display = "none";
+          document.querySelector("#start").style.display = "inline-block";
+          document.querySelector("#results").innerText = "Done, " + state.correct + " correct of " + state.total + " questions.";
+        }
+
+        function answerSelected(li) {
+          document.querySelector("#answers").classList.add("disabled");
+
+          state.total++;
+          li.classList.add("selected");
+          if(li.classList.contains("correct")) state.correct++;
+
+          setTimeout(function() {
+            document.querySelector("#answers").classList.remove("disabled");
+            nextQuestion();
+          }, 1000);
+        }
+
+        document.querySelector("#title").innerText = cardSet.text;
+
+        document.body.addEventListener("click", function(e) {
+          if(e.target && e.target.matches("#answers:not(.disabled) li")) answerSelected(e.target);
+        });
+
+        document.querySelector("#stop").addEventListener("click", function(event) {
+          event.preventDefault();
+          completeRound();
+        });
+
+        document.querySelector("#start").addEventListener("click", function(event) {
+          event.preventDefault();
+          startRound();
+        });
+      });
+    </script>
   </head>
   <body>
     <div id="page-wrapper">
