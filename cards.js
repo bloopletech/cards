@@ -1,22 +1,64 @@
-var allAnswers = [];
-var wrongAnswerCount = 0;
-var currentRound = null;
+$(function() {
+  cardSet.allAnswers = _.chain(cardSet.cards).map(function(question) {
+    return question.answer;
+  }).uniq().value();
 
-function setupUI() {
+  cardSet.wrongAnswerCount = (cardSet.allAnswers.length > 3 ? 3 : (cardSet.allAnswers.length - 1));
+
+  var state = null;
+
+  function nextQuestion() {
+    var card = state.cards.shift();
+    if(card) showCard(card);
+    else completeRound();
+  }
+
+  function showCard(card) {
+    $("#question").text(card.text);
+
+    var answers = _.chain(cardSet.allAnswers).without(card.answer).shuffle().first(cardSet.wrongAnswerCount).
+      value();
+    answers.push(card.answer);
+
+    $("#answers").empty();
+    _.each(_.shuffle(answers), function(answer) {
+      var li = $("<li>");
+      li.addClass("btn btn-primary");
+      li.text(answer);
+
+      if(answer == card.answer) li.addClass("correct");
+      $("#answers").append(li);
+    });
+  }
+
+  function startRound() {
+    state = {
+      cards: _.shuffle(cardSet.cards),
+      correct: 0,
+      total: 0
+    };
+
+    nextQuestion();
+    $("#card").show();
+    $("#stop").show();
+    $("#start").hide();
+  }
+
+  function completeRound() {
+    $("#card").hide();
+    $("#stop").hide();
+    $("#start").show();
+    $("#results").text("Done, " + state.correct + " correct of " + state.total + " questions.");
+  }
+
   $("#title").text(cardSet.text);
 
   $(document).on("click", "#answers:not(.disabled) li", function() {
     $("#answers").addClass("disabled");
 
-    currentRound.total++;
-
-    if($(this).text() == currentAnswer) {
-      currentRound.correct++;
-      $(this).addClass("correct");
-    }
-    else {
-      $(this).addClass("incorrect");
-    }
+    state.total++;
+    $(this).addClass("selected");
+    if($(this).hasClass("correct")) state.correct++;
 
     setTimeout(function() {
       $("#answers").removeClass("disabled");
@@ -33,61 +75,4 @@ function setupUI() {
     event.preventDefault();
     startRound();
   });
-}
-
-function nextQuestion() {
-  currentQuestion = currentRound.questions.shift();
-
-  if(currentQuestion == null) {
-    completeRound();
-    return;
-  }
-
-  $("#question").text(currentQuestion.text);
-  currentAnswer = currentQuestion.answer;
-
-  var answers = _.chain(allAnswers).without(currentAnswer).shuffle().first(wrongAnswerCount).value();
-  answers.push(currentAnswer);
-
-  $("#answers").empty();
-  _.each(_.shuffle(answers), function(answer) {
-    var li = $("<li>");
-    li.addClass("btn");
-    li.addClass("btn-primary");
-    li.text(answer);
-    $("#answers").append(li);
-  });
-}
-
-function startRound() {
-  currentRound = {
-    questions: _.shuffle(cardSet.cards),
-    currentQuestion: null,
-    currentAnswer: null,
-    correct: 0,
-    total: 0
-  };
-
-  nextQuestion();
-  $("#card").show();
-  $("#stop").show();
-  $("#start").hide();
-}
-
-function completeRound() {
-  $("#card").hide();
-  $("#stop").hide();
-  $("#start").show();
-  $("#results").text("Done, " + currentRound.correct + " correct of " + currentRound.total + " questions.");
-}
-
-$(function() {
-  allAnswers = _.map(cardSet.cards, function(question) {
-    return question.answer;
-  });
-  allAnswers = _.uniq(allAnswers);
-
-  wrongAnswerCount = (allAnswers.length > 3 ? 3 : (allAnswers.length - 1));
-
-  setupUI();
 });

@@ -103,20 +103,21 @@ h2 {
   margin-right: 0;
 }
 
-#answers li.correct {
-  background-color: #449d44;
-  border-color: #398439;
-}
-
-#answers li.correct::after {
-  content: " ✓";
-}
-
-#answers li.incorrect {
+#answers li.selected {
   background-color: #d9534f;
   border-color: #d43f3a;
 }
 
-#answers li.incorrect::after {
+#answers li.selected::after {
   content: " ✗";
 }
+
+#answers li.selected.correct {
+  background-color: #449d44;
+  border-color: #398439;
+}
+
+#answers li.selected.correct::after {
+  content: " ✓";
+}
+
