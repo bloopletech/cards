@@ -3,6 +3,8 @@
   <head>
     <meta charset='utf-8'>
     <title>Cards</title>
+    <meta name="HandheldFriendly" content="true">
+    <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no">
     <style type="text/css">
       * {
         box-sizing: border-box;
@@ -79,7 +81,7 @@
       #page-wrapper {
         max-width: 600px;
         margin: 0 auto;
-        padding-top: 45px;
+        padding-top: 40px;
       }
 
       #card {
@@ -125,6 +127,18 @@
 
       #answers li.selected.correct::after {
         content: " ✓";
+      }
+
+      @media screen and (max-width: 767px) {
+        #page-wrapper {
+          padding: 20px;
+        }
+
+        #answers li {
+          display: block;
+          margin-left: 0;
+          margin-right: 0;
+        }
       }
     </style>
     <script src="underscore-min.js"></script>
