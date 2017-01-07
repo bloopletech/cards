@@ -163,6 +163,8 @@
     <script src="underscore-min.js"></script>
     <script src="card-set.js"></script>
     <script>
+      $ = document.querySelector.bind(document);
+
       document.addEventListener("DOMContentLoaded", function(event) {
         cardSet.allAnswers = _.chain(cardSet.cards).pluck('answer').uniq().value();
 
@@ -177,13 +179,13 @@
         }
 
         function showCard(card) {
-          document.querySelector("#question").innerText = card.text;
+          $("#question").innerText = card.text;
 
           var answers = _.chain(cardSet.allAnswers).without(card.answer).shuffle().first(cardSet.wrongAnswerCount).
             value();
           answers.push(card.answer);
 
-          document.querySelector("#answers").innerHTML = "";
+          $("#answers").innerHTML = "";
           _.each(_.shuffle(answers), function(answer) {
             var li = document.createElement("li");
             li.classList.add("btn");
@@ -191,7 +193,7 @@
             li.innerText = answer;
 
             if(answer == card.answer) li.classList.add("correct");
-            document.querySelector("#answers").appendChild(li);
+            $("#answers").appendChild(li);
           });
         }
 
@@ -203,47 +205,47 @@
           };
 
           nextQuestion();
-          document.querySelector("#title").classList.add("muted");
-          document.querySelector("#results").classList.add("hidden");
-          document.querySelector("#card").classList.remove("hidden");
-          document.querySelector("#stop").classList.remove("hidden");
-          document.querySelector("#start").classList.add("hidden");
+          $("#title").classList.add("muted");
+          $("#results").classList.add("hidden");
+          $("#card").classList.remove("hidden");
+          $("#stop").classList.remove("hidden");
+          $("#start").classList.add("hidden");
         }
 
         function completeRound() {
-          document.querySelector("#title").classList.remove("muted");
-          document.querySelector("#card").classList.add("hidden");
-          document.querySelector("#stop").classList.add("hidden");
-          document.querySelector("#start").classList.remove("hidden");
-          document.querySelector("#results").innerText = "Done, " + state.correct + "/" + state.seen + " correct answers.";
-          document.querySelector("#results").classList.remove("hidden");
+          $("#title").classList.remove("muted");
+          $("#card").classList.add("hidden");
+          $("#stop").classList.add("hidden");
+          $("#start").classList.remove("hidden");
+          $("#results").innerText = "Done, " + state.correct + "/" + state.seen + " correct answers.";
+          $("#results").classList.remove("hidden");
         }
 
         function answerSelected(li) {
-          document.querySelector("#answers").classList.add("disabled");
+          $("#answers").classList.add("disabled");
 
           state.seen++;
           li.classList.add("selected");
           if(li.classList.contains("correct")) state.correct++;
 
           setTimeout(function() {
-            document.querySelector("#answers").classList.remove("disabled");
+            $("#answers").classList.remove("disabled");
             nextQuestion();
           }, 1000);
         }
 
-        document.querySelector("#title").innerText = cardSet.title;
+        $("#title").innerText = cardSet.title;
 
         document.body.addEventListener("click", function(e) {
           if(e.target && e.target.matches("#answers:not(.disabled) li")) answerSelected(e.target);
         });
 
-        document.querySelector("#stop").addEventListener("click", function(event) {
+        $("#stop").addEventListener("click", function(event) {
           event.preventDefault();
           completeRound();
         });
 
-        document.querySelector("#start").addEventListener("click", function(event) {
+        $("#start").addEventListener("click", function(event) {
           event.preventDefault();
           startRound();
         });
