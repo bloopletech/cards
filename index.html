@@ -165,15 +165,33 @@
       }
     </style>
     <script src="underscore-min.js"></script>
-    <script src="card-set.js"></script>
     <script>
-      $ = document.querySelector.bind(document);
-
       document.addEventListener("DOMContentLoaded", function(event) {
-        cardSet.allAnswers = _.chain(cardSet.cards).pluck('answer').uniq().value();
-        cardSet.wrongAnswerCount = (cardSet.allAnswers.length > 3 ? 3 : (cardSet.allAnswers.length - 1));
-
+        $ = document.querySelector.bind(document);
+        var cardSet = null;
         var state = null;
+
+        function getCardSet(url) {
+          var request = new XMLHttpRequest();
+
+          request.onreadystatechange = function() {
+            if(request.readyState === XMLHttpRequest.DONE && request.status === 200) {
+              cardSet = JSON.parse(request.responseText);
+              setupCardSet();
+            }
+          };
+
+          request.open('GET', url);
+          request.send();
+        }
+
+        function setupCardSet() {
+          cardSet.allAnswers = _.chain(cardSet.cards).pluck('answer').uniq().value();
+          cardSet.wrongAnswerCount = (cardSet.allAnswers.length > 3 ? 3 : (cardSet.allAnswers.length - 1));
+
+          $("#title").textContent = cardSet.title;
+          $("#start").classList.remove("hidden");
+        }
 
         function nextQuestion() {
           var card = state.cards.shift();
@@ -237,8 +255,6 @@
           }, 1000);
         }
 
-        $("#title").textContent = cardSet.title;
-
         document.body.addEventListener("click", function(e) {
           if(e.target && e.target.matches("#answers:not(.disabled) li")) answerSelected(e.target);
         });
@@ -252,6 +268,8 @@
           event.preventDefault();
           startRound();
         });
+
+        getCardSet("card-set.json");
       });
     </script>
   </head>
@@ -264,7 +282,7 @@
       </div>
       <p id="results" class="hidden"></p>
       <a id="stop" href="#" class="btn btn-default hidden">Finish</a>
-      <a id="start" href="#" class="btn btn-default">Start</a>
+      <a id="start" href="#" class="btn btn-default hidden">Start</a>
     </div>
   </body>
 </html>
