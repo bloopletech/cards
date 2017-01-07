@@ -129,6 +129,14 @@
         content: " ✓";
       }
 
+      #results {
+        padding: 15px;
+        color: #3c763d;
+        background-color: #dff0d8;
+        border: 1px solid #d6e9c6;
+        border-radius: 4px;
+      }
+
       @media screen and (max-width: 767px) {
         #page-wrapper {
           padding: 20px;
@@ -145,9 +153,7 @@
     <script src="card-set.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function(event) {
-        cardSet.allAnswers = _.chain(cardSet.cards).map(function(question) {
-          return question.answer;
-        }).uniq().value();
+        cardSet.allAnswers = _.chain(cardSet.cards).pluck('answer').uniq().value();
 
         cardSet.wrongAnswerCount = (cardSet.allAnswers.length > 3 ? 3 : (cardSet.allAnswers.length - 1));
 
@@ -182,10 +188,11 @@
           state = {
             cards: _.shuffle(cardSet.cards),
             correct: 0,
-            total: 0
+            seen: 0
           };
 
           nextQuestion();
+          document.querySelector("#results").style.display = "none";
           document.querySelector("#card").style.display = "block";
           document.querySelector("#stop").style.display = "inline-block";
           document.querySelector("#start").style.display = "none";
@@ -195,13 +202,14 @@
           document.querySelector("#card").style.display = "none";
           document.querySelector("#stop").style.display = "none";
           document.querySelector("#start").style.display = "inline-block";
-          document.querySelector("#results").innerText = "Done, " + state.correct + " correct of " + state.total + " questions.";
+          document.querySelector("#results").innerText = "Done, " + state.correct + "/" + state.seen + " correct answers.";
+          document.querySelector("#results").style.display = "block";
         }
 
         function answerSelected(li) {
           document.querySelector("#answers").classList.add("disabled");
 
-          state.total++;
+          state.seen++;
           li.classList.add("selected");
           if(li.classList.contains("correct")) state.correct++;
 
@@ -211,6 +219,7 @@
           }, 1000);
         }
 
+        document.querySelector("#results").style.display = "none";
         document.querySelector("#title").innerText = cardSet.text;
 
         document.body.addEventListener("click", function(e) {
@@ -236,9 +245,9 @@
         <h2 id="question"></h2>
         <ul id="answers"></ul>
       </div>
+      <p id="results"></p>
       <a id="stop" href="#" class="btn btn-default" style="display: none;">Finish</a>
       <a id="start" href="#" class="btn btn-default">Start</a>
-      <p id="results"></p>
     </div>
   </body>
 </html>
