@@ -23,17 +23,21 @@
 
       body, button, input {
         font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-        font-size: 18px;
+        font-size: 20px;
         line-height: 1.4;
       }
 
-      h1 {
-        margin-top: 0;
+      h1, h2 {
+        margin: 0 0 24px 0;
+        font-weight: normal;
       }
 
+      h1 {
+        font-size: 26px;
+      }
 
-      h2 {
-        margin-top: 0;
+      h3 {
+        font-size: 30px;
       }
 
       .btn {
@@ -78,10 +82,18 @@
         border-color: #204d74;
       }
 
+      .hidden {
+        display: none;
+      }
+
+      .muted {
+        color: #777;
+      }
+
       #page-wrapper {
         max-width: 600px;
         margin: 0 auto;
-        padding-top: 40px;
+        padding-top: 20px;
       }
 
       #card {
@@ -98,7 +110,6 @@
       }
 
       #answers li {
-        font-size: 20px;
         margin-left: 5px;
         margin-right: 5px;
       }
@@ -192,18 +203,20 @@
           };
 
           nextQuestion();
-          document.querySelector("#results").style.display = "none";
-          document.querySelector("#card").style.display = "block";
-          document.querySelector("#stop").style.display = "inline-block";
-          document.querySelector("#start").style.display = "none";
+          document.querySelector("#title").classList.add("muted");
+          document.querySelector("#results").classList.add("hidden");
+          document.querySelector("#card").classList.remove("hidden");
+          document.querySelector("#stop").classList.remove("hidden");
+          document.querySelector("#start").classList.add("hidden");
         }
 
         function completeRound() {
-          document.querySelector("#card").style.display = "none";
-          document.querySelector("#stop").style.display = "none";
-          document.querySelector("#start").style.display = "inline-block";
+          document.querySelector("#title").classList.remove("muted");
+          document.querySelector("#card").classList.add("hidden");
+          document.querySelector("#stop").classList.add("hidden");
+          document.querySelector("#start").classList.remove("hidden");
           document.querySelector("#results").innerText = "Done, " + state.correct + "/" + state.seen + " correct answers.";
-          document.querySelector("#results").style.display = "block";
+          document.querySelector("#results").classList.remove("hidden");
         }
 
         function answerSelected(li) {
@@ -219,8 +232,7 @@
           }, 1000);
         }
 
-        document.querySelector("#results").style.display = "none";
-        document.querySelector("#title").innerText = cardSet.text;
+        document.querySelector("#title").innerText = cardSet.title;
 
         document.body.addEventListener("click", function(e) {
           if(e.target && e.target.matches("#answers:not(.disabled) li")) answerSelected(e.target);
@@ -241,12 +253,12 @@
   <body>
     <div id="page-wrapper">
       <h1 id="title"></h1>
-      <div id="card" style="display: none;">
+      <div id="card" class="hidden">
         <h2 id="question"></h2>
         <ul id="answers"></ul>
       </div>
-      <p id="results"></p>
-      <a id="stop" href="#" class="btn btn-default" style="display: none;">Finish</a>
+      <p id="results" class="hidden"></p>
+      <a id="stop" href="#" class="btn btn-default hidden">Finish</a>
       <a id="start" href="#" class="btn btn-default">Start</a>
     </div>
   </body>
