@@ -103,6 +103,10 @@
         margin-bottom: 20px;
       }
 
+      #question {
+        white-space: pre-line;
+      }
+
       #answers {
         list-style-type: none;
         margin: 0;
@@ -167,7 +171,6 @@
 
       document.addEventListener("DOMContentLoaded", function(event) {
         cardSet.allAnswers = _.chain(cardSet.cards).pluck('answer').uniq().value();
-
         cardSet.wrongAnswerCount = (cardSet.allAnswers.length > 3 ? 3 : (cardSet.allAnswers.length - 1));
 
         var state = null;
