@@ -179,18 +179,18 @@
         }
 
         function showCard(card) {
-          $("#question").innerText = card.text;
+          $("#question").textContent = card.text;
 
           var answers = _.chain(cardSet.allAnswers).without(card.answer).shuffle().first(cardSet.wrongAnswerCount).
             value();
           answers.push(card.answer);
 
-          $("#answers").innerHTML = "";
+          $("#answers").textContent = "";
           _.each(_.shuffle(answers), function(answer) {
             var li = document.createElement("li");
             li.classList.add("btn");
             li.classList.add("btn-primary");
-            li.innerText = answer;
+            li.textContent = answer;
 
             if(answer == card.answer) li.classList.add("correct");
             $("#answers").appendChild(li);
@@ -217,7 +217,7 @@
           $("#card").classList.add("hidden");
           $("#stop").classList.add("hidden");
           $("#start").classList.remove("hidden");
-          $("#results").innerText = "Done, " + state.correct + "/" + state.seen + " correct answers.";
+          $("#results").textContent = "Done, " + state.correct + "/" + state.seen + " correct answers.";
           $("#results").classList.remove("hidden");
         }
 
@@ -234,7 +234,7 @@
           }, 1000);
         }
 
-        $("#title").innerText = cardSet.title;
+        $("#title").textContent = cardSet.title;
 
         document.body.addEventListener("click", function(e) {
           if(e.target && e.target.matches("#answers:not(.disabled) li")) answerSelected(e.target);
