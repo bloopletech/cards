@@ -167,7 +167,7 @@
         var state = null;
 
         function getCardSetURL() {
-          return decodeURIComponent(window.location.search.substring(1));
+          return "sets/" + decodeURIComponent(window.location.search.substring(1)) + ".json";
         }
 
         function getCardSet(url) {
