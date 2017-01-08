@@ -30,13 +30,6 @@
       h1, h2 {
         margin: 0 0 24px 0;
         font-weight: normal;
-      }
-
-      h1 {
-        font-size: 26px;
-      }
-
-      h3 {
         font-size: 30px;
       }
 
@@ -81,14 +74,10 @@
         display: none;
       }
 
-      .muted {
-        color: #777;
-      }
-
       #page-wrapper {
         max-width: 600px;
         margin: 0 auto;
-        padding-top: 20px;
+        padding-top: 30px;
       }
 
       #card {
@@ -96,10 +85,6 @@
         box-shadow: 0 1px 1px rgba(0,0,0,.05);
         padding: 20px;
         margin-bottom: 20px;
-      }
-
-      #question {
-        white-space: pre-line;
       }
 
       #answers {
@@ -225,7 +210,6 @@
           };
 
           nextQuestion();
-          $("#title").classList.add("muted");
           $("#results").classList.add("hidden");
           $("#card").classList.remove("hidden");
           $("#stop").classList.remove("hidden");
@@ -233,7 +217,6 @@
         }
 
         function completeRound() {
-          $("#title").classList.remove("muted");
           $("#card").classList.add("hidden");
           $("#stop").classList.add("hidden");
           $("#start").classList.remove("hidden");
