@@ -148,20 +148,18 @@
     <script>
       document.addEventListener("DOMContentLoaded", function(event) {
         $ = document.querySelector.bind(document);
-        var cardSet = null;
         var state = null;
 
         function getCardSetURL() {
           return "sets/" + decodeURIComponent(window.location.search.substring(1)) + ".json";
         }
 
-        function getCardSet(url) {
+        function loadCardSet(url, callback) {
           var request = new XMLHttpRequest();
 
           request.onreadystatechange = function() {
             if(request.readyState === XMLHttpRequest.DONE && request.status === 200) {
-              cardSet = JSON.parse(request.responseText);
-              setupCardSet();
+              callback(JSON.parse(request.responseText));
             }
           };
 
@@ -169,15 +167,21 @@
           request.send();
         }
 
-        function setupCardSet() {
-          cardSet.allAnswers = _.chain(cardSet.cards).pluck('answer').uniq().value();
-          cardSet.wrongAnswerCount = _.min([cardSet.allAnswers.length - 1, 3]);
+        function setupState(newState) {
+          state = newState;
 
-          $("#title").textContent = cardSet.title;
+          $("#title").textContent = state.cardSet.title;
           $("#start").classList.remove("hidden");
+
+          if(state.playing) startRound();
+        }
+
+        function saveState() {
+          window.localStorage["state"] = JSON.stringify(state);
         }
 
         function nextQuestion() {
+          saveState();
           var card = state.cards.shift();
           if(card) showCard(card);
           else completeRound();
@@ -186,8 +190,8 @@
         function showCard(card) {
           $("#question").textContent = card.text;
 
-          var answers = _.chain(cardSet.allAnswers).without(card.answer).shuffle().first(cardSet.wrongAnswerCount).
-            value();
+          var answers = _.chain(state.cardSet.allAnswers).without(card.answer).shuffle().
+            first(state.cardSet.wrongAnswerCount).value();
           answers.push(card.answer);
 
           $("#answers").textContent = "";
@@ -202,13 +206,14 @@
           });
         }
 
-        function startRound() {
-          state = {
-            cards: _.shuffle(cardSet.cards),
-            correct: 0,
-            seen: 0
-          };
+        function setupRound() {
+          state.cards = _.shuffle(state.cardSet.cards);
+          state.correct = 0;
+          state.seen = 0;
+          state.playing = true;
+        }
 
+        function startRound() {
           nextQuestion();
           $("#results").classList.add("hidden");
           $("#card").classList.remove("hidden");
@@ -222,6 +227,11 @@
           $("#start").classList.remove("hidden");
           $("#results").textContent = "Done, " + state.correct + "/" + state.seen + " correct answers.";
           $("#results").classList.remove("hidden");
+
+          state.correct = 0;
+          state.seen = 0;
+          state.playing = false;
+          saveState();
         }
 
         function answerSelected(li) {
@@ -248,10 +258,23 @@
 
         $("#start").addEventListener("click", function(event) {
           event.preventDefault();
+          setupRound();
           startRound();
         });
 
-        getCardSet(getCardSetURL());
+        if(typeof window.localStorage["state"] != "undefined") {
+          setupState(JSON.parse(window.localStorage["state"]));
+        }
+        else {
+          loadCardSet(getCardSetURL(), function(cardSet) {
+            cardSet.allAnswers = _.chain(cardSet.cards).pluck('answer').uniq().value();
+            cardSet.wrongAnswerCount = _.min([cardSet.allAnswers.length - 1, 3]);
+
+            setupState({
+              cardSet: cardSet
+            });
+          });
+        }
       });
     </script>
   </head>
