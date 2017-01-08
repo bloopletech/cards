@@ -154,17 +154,26 @@
           return "sets/" + decodeURIComponent(window.location.search.substring(1)) + ".json";
         }
 
-        function loadCardSet(url, callback) {
+        function loadCardSet() {
           var request = new XMLHttpRequest();
 
           request.onreadystatechange = function() {
             if(request.readyState === XMLHttpRequest.DONE && request.status === 200) {
-              callback(JSON.parse(request.responseText));
+              cardSetLoaded(JSON.parse(request.responseText));
             }
           };
 
-          request.open('GET', url);
+          request.open('GET', getCardSetURL());
           request.send();
+        }
+
+        function cardSetLoaded(cardSet) {
+          cardSet.allAnswers = _.chain(cardSet.cards).pluck('answer').uniq().value();
+          cardSet.wrongAnswerCount = _.min([cardSet.allAnswers.length - 1, 3]);
+
+          setupState({
+            cardSet: cardSet
+          });
         }
 
         function setupState(newState) {
@@ -206,7 +215,7 @@
           });
         }
 
-        function setupRound() {
+        function initRound() {
           state.cardIndexes = _.shuffle(_.range(state.cardSet.cards.length));
           state.correct = 0;
           state.seen = 0;
@@ -247,8 +256,8 @@
           }, 1000);
         }
 
-        document.body.addEventListener("click", function(e) {
-          if(e.target && e.target.matches("#answers:not(.disabled) li")) answerSelected(e.target);
+        document.body.addEventListener("click", function(event) {
+          if(event.target && event.target.matches("#answers:not(.disabled) li")) answerSelected(event.target);
         });
 
         $("#stop").addEventListener("click", function(event) {
@@ -258,23 +267,12 @@
 
         $("#start").addEventListener("click", function(event) {
           event.preventDefault();
-          setupRound();
+          initRound();
           startRound();
         });
 
-        if(typeof window.localStorage["state"] != "undefined") {
-          setupState(JSON.parse(window.localStorage["state"]));
-        }
-        else {
-          loadCardSet(getCardSetURL(), function(cardSet) {
-            cardSet.allAnswers = _.chain(cardSet.cards).pluck('answer').uniq().value();
-            cardSet.wrongAnswerCount = _.min([cardSet.allAnswers.length - 1, 3]);
-
-            setupState({
-              cardSet: cardSet
-            });
-          });
-        }
+        if(_.isString(window.localStorage["state"])) setupState(JSON.parse(window.localStorage["state"]));
+        else loadCardSet();
       });
     </script>
   </head>
