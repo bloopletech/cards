@@ -171,6 +171,10 @@
         var cardSet = null;
         var state = null;
 
+        function getCardSetURL() {
+          return decodeURIComponent(window.location.search.substring(1));
+        }
+
         function getCardSet(url) {
           var request = new XMLHttpRequest();
 
@@ -269,7 +273,7 @@
           startRound();
         });
 
-        getCardSet("card-set.json");
+        getCardSet(getCardSetURL());
       });
     </script>
   </head>
