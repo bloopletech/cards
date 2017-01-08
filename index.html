@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <title>Cards</title>
     <meta name="HandheldFriendly" content="true">
     <meta name="viewport" content="width=device-width, height=device-height, user-scalable=no">
@@ -41,23 +41,18 @@
       }
 
       .btn {
-          display: inline-block;
-          padding: 6px 12px;
-          text-align: center;
-          vertical-align: middle;
-          touch-action: manipulation;
-          cursor: pointer;
-          user-select: none;
-          border: 1px solid transparent;
-          border-radius: 4px;
-          margin: 5px 0;
-          font-size: 20px;
-          text-decoration: none;
-        }
-      }
-
-      .btn:hover {
-
+        display: inline-block;
+        padding: 6px 12px;
+        text-align: center;
+        vertical-align: middle;
+        touch-action: manipulation;
+        cursor: pointer;
+        user-select: none;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        margin: 5px 0;
+        font-size: 20px;
+        text-decoration: none;
       }
 
       .btn-default {
@@ -191,7 +186,7 @@
 
         function setupCardSet() {
           cardSet.allAnswers = _.chain(cardSet.cards).pluck('answer').uniq().value();
-          cardSet.wrongAnswerCount = (cardSet.allAnswers.length > 3 ? 3 : (cardSet.allAnswers.length - 1));
+          cardSet.wrongAnswerCount = _.min([cardSet.allAnswers.length - 1, 3]);
 
           $("#title").textContent = cardSet.title;
           $("#start").classList.remove("hidden");
