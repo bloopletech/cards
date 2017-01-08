@@ -182,7 +182,7 @@
 
         function nextQuestion() {
           saveState();
-          var card = state.cards.shift();
+          var card = state.cardSet.cards[state.cardIndexes.shift()];
           if(card) showCard(card);
           else completeRound();
         }
@@ -207,7 +207,7 @@
         }
 
         function setupRound() {
-          state.cards = _.shuffle(state.cardSet.cards);
+          state.cardIndexes = _.shuffle(_.range(state.cardSet.cards.length));
           state.correct = 0;
           state.seen = 0;
           state.playing = true;
