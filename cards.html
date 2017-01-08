@@ -228,12 +228,14 @@
           $("#card").classList.remove("hidden");
           $("#stop").classList.remove("hidden");
           $("#start").classList.add("hidden");
+          $("#reset").classList.add("hidden");
         }
 
         function completeRound() {
           $("#card").classList.add("hidden");
           $("#stop").classList.add("hidden");
           $("#start").classList.remove("hidden");
+          $("#reset").classList.remove("hidden");
           $("#results").textContent = "Done, " + state.correct + "/" + state.seen + " correct answers.";
           $("#results").classList.remove("hidden");
 
@@ -271,6 +273,15 @@
           startRound();
         });
 
+        $("#reset").addEventListener("click", function(event) {
+          event.preventDefault();
+
+          if(confirm("Are you sure?")) {
+            window.localStorage.removeItem("state");
+            window.location.reload();
+          }
+        });
+
         if(_.isString(window.localStorage["state"])) setupState(JSON.parse(window.localStorage["state"]));
         else loadCardSet();
       });
@@ -286,6 +297,7 @@
       <p id="results" class="hidden"></p>
       <a id="stop" href="#" class="btn btn-default hidden">Finish</a>
       <a id="start" href="#" class="btn btn-default hidden">Start</a>
+      <a id="reset" href="#" class="btn btn-default hidden">Reset</a>
     </div>
   </body>
 </html>
